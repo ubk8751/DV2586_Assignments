@@ -1,6 +1,5 @@
 import numpy as np
-from matplotlib.pyplot import plot
-from matplotlib.pyplot import show
+import matplotlib.pyplot as plt
 
 def f_dx(x,y):
     return 2*x - 3 * np.sin(3*x) + y + 2
@@ -29,8 +28,13 @@ if __name__ == "__main__":
 
     gradDecent(startValX, startValY, n, lr, resList)
     x_axis = list(range(1, 101))
-
-    plot(x_axis, resList)
-    show()
-    #print(resList)
-    #print(x_axis)
+    fig, ax = plt.subplots()
+    ax.plot(x_axis, resList)
+    ax.set_xlabel("Steps")
+    ax.set_ylabel("f(x,y)-value")
+    ax.set_yticks(np.arange(-5, 55,step=5))
+    ax.grid(True, which="both")
+    ax.axhline(0, color='black', linewidth=.5)
+    ax.axhline(-2.3, color='black', linewidth=.5)
+    plt.show()
+    print(resList[-1])
