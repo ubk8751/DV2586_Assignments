@@ -26,21 +26,37 @@ from keras.applications.resnet import decode_predictions
 from keras.preprocessing.image import image
 from keras.preprocessing.image import img_to_array
 
-def gen_vgg():
-    return 0
+def _train_vgg():
+    pass
 
-def gen_densenet():
-    return 0
+def _train_densenet():
+    pass
 
-def gen_resnet():
-    return 0
+def _train_resnet():
+    pass
 
-def gen_imgGPT():
-    return 0
+def _train_imgGPT():
+    pass
 
-def gen_models():
-    vgg = gen_vgg()
-    densenet = gen_densenet()
-    resnet = gen_resnet()
-    imgGPT = gen_imgGPT()
+def get_vgg():
+    model = _train_vgg()
+    return model
+
+def get_densenet():
+    model = _train_densenet()
+    return model
+
+def get_resnet():
+    model = _train_resnet()
+    return model
+
+def get_imgGPT():
+    model = _train_imgGPT()
+    return model
+
+def get_models():
+    vgg         = get_vgg()
+    densenet    = get_densenet()
+    resnet      = get_resnet()
+    imgGPT      = get_imgGPT()
     return vgg, densenet, resnet, imgGPT
