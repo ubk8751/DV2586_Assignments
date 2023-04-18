@@ -24,18 +24,20 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = split_data(images, labels)
 
     #Train models
-    vgg, densenet, resnet = get_models() # imgGPT
+    #vgg, densenet, resnet = get_models() # imgGPT
 
     # Fit models
     fit_models = {}
-    for mod in [vgg, densenet, resnet]:
-        fit_models[mod] = fit_model(mod, X_train, y_train, X_test, y_test)
+    #for mod in [vgg, densenet, resnet]:
+    #    fit_models[mod] = fit_model(mod, X_train, y_train, X_test, y_test)
 
     # Evaluate models
-    vgg_stat        = evaluate(vgg, fit_models[vgg], X_test, y_test)
-    densenet_stat   = evaluate(densenet, fit_models[densenet], X_test, y_test)
-    resnet_stat     = evaluate(resnet, fit_models[resnet], X_test, y_test)
+    #vgg_stat        = evaluate(vgg, fit_models[vgg], X_test, y_test)
+    #densenet_stat   = evaluate(densenet, fit_models[densenet], X_test, y_test)
+    #resnet_stat     = evaluate(resnet, fit_models[resnet], X_test, y_test)
 
-    print(vgg_stat)
-    print(densenet_stat)
-    print(resnet_stat)
+    imggpt = get_imgGPT()
+    imggpt.compile("sgd")
+    fitimggpt = imggpt.fit(X_train, y_train, X_test, y_test, epochs=20, batch_size=128)
+
+    imggpt.summary()

@@ -40,3 +40,14 @@ def split_data(images, labels):
     y = to_categorical(labels,num_classes=10)
     X_train, X_test, y_train, y_test = train_test_split(images, y, random_state=42, test_size=0.2)
     return X_train, X_test, y_train, y_test
+
+def data_normalization(xt, xv):
+    x_train = xt
+    x_val = xv
+    x_train = np.array(xt)/255
+    x_train.reshape(-1, 32, 32, 1)
+    x_val = np.array(xv)/255
+    x_val.reshape(-1, 32, 32, 1)
+    return x_train, x_val
+
+
