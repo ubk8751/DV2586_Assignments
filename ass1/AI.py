@@ -1,33 +1,20 @@
-# Importing the libs to work
 # Maths
 import numpy as np
 import matplotlib as plt
 
 # Models
-# ResNet-50
 from keras.applications.resnet import ResNet50
-from keras.applications.resnet import preprocess_input
-
-# Densenet-121
 from keras.applications.densenet import DenseNet121
-from keras.applications.densenet import preprocess_input
-
-# VGG-19
 from keras.applications.vgg19 import VGG19
-from keras.applications.vgg19 import preprocess_input
 
 # Other
-import pandas as pd 
-import os
-from tqdm import tqdm
-from keras.optimizers import Adam, SGD
-from keras.models import Model, load_model
 from keras.layers import *
-from sklearn.model_selection import train_test_split
 from keras.callbacks import *
 from keras.applications.resnet import decode_predictions
 from keras.utils import to_categorical, img_to_array
 from keras.models import Sequential
+
+from imgGPT import ImgGPT
 
 # Evaluate model
 def evaluate(model, hist, xv, yv):
@@ -40,74 +27,45 @@ def evaluate(model, hist, xv, yv):
     }
     return ret
 
-# Train the premade models
-def _train_vgg(xt, yt, xv, yv):
-    vgg19 = VGG19(weights='imagenet', include_top=False, input_shape=(32,32,3))
+# Train model
+def _build_model(mod):
     model = Sequential()
-    # Add model
-    model.add(vgg19)
-
-    # Last model steps
+    model.add(mod)
     model.add(Flatten())
     model.add(Dense(10, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    return model
 
-    fitmod = model.fit(xt, yt, epochs=20, batch_size=128, validation_data=(xv, yv))
-    return model, fitmod
+# Fit model
+def fit_model(mod, xt, yt, xv, yv):
+    fitmod = mod.fit(xt, yt, epochs=20, batch_size=128, validation_data=(xv, yv))
+    return fitmod
 
-def _train_densenet(xt, yt, xv, yv):
-    densenet = DenseNet121(weights='imagenet', include_top=False, input_shape=(32,32,3))
-    model = Sequential()
-    # Add model
-    model.add(densenet)
+# External for generating singular models
+def get_vgg():
+    mod = VGG19(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    model = _build_model(mod)
+    return model
 
-    # Last model steps
-    model.add(Flatten())
-    model.add(Dense(10, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+def get_densenet():
+    mod = DenseNet121(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    model = _build_model(mod)
+    return model
 
-    fitmod = model.fit(xt, yt, epochs=20, batch_size=128, validation_data=(xv, yv))
-    return model, fitmod
+def get_resnet():
+    mod = ResNet50(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    model = _build_model(mod)
+    return model
 
-def _train_resnet(xt, yt, xv, yv):
-    resnet = ResNet50(weights='imagenet', include_top=False, input_shape=(32,32,3))
-    model = Sequential()
-    # Add model
-    model.add(resnet)
-
-    # Last model steps
-    model.add(Flatten())
-    model.add(Dense(10, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
-
-    fitmod = model.fit(xt, yt, epochs=20, batch_size=128, validation_data=(xv, yv))
-    return model, fitmod
-
-# Train self-made architecture
-def _train_imgGPT():
-    return None
-
-#External functions for generating models
-def get_vgg(xt, yt, xv, yv):
-    model, fitmod = _train_vgg(xt, yt, xv, yv)
-    return model, fitmod
-
-def get_densenet(xt, yt, xv, yv):
-    model, fitmod = _train_densenet(xt, yt, xv, yv)
-    return model, fitmod
-
-def get_resnet(xt, yt, xv, yv):
-    model, fitmod = _train_resnet(xt, yt, xv, yv)
-    return model, fitmod
-
-def get_imgGPT(xt, yt, xv, yv):
-    model, fitmod = _train_imgGPT(xt, yt, xv, yv)
-    return model, fitmod
+def get_imgGPT():
+    mod = ImgGPT(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    model = _build_model(mod)
+    return model
 
 # To generate all three models at a time
-def get_models(xt, yt, xv, yv):
-    vgg, fitvgg        = get_vgg(xt, yt, xv, yv)
-    densenet, fitDN    = get_densenet(xt, yt, xv, yv)
-    resnet, fitRN      = get_resnet(xt, yt, xv, yv)
-    #imgGPT, fitGPT      = get_imgGPT()
-    return vgg, fitvgg, densenet, fitDN, resnet, fitRN#, imgGPT
+def get_models():
+    vgg        = get_vgg()
+    densenet   = get_densenet()
+    resnet     = get_resnet()
+    #imgGPT      = get_imgGPT()
+    return vgg, densenet, resnet#, imgGPT
