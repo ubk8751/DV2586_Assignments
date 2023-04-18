@@ -10,21 +10,20 @@ class ImgGPT(Model):
         super().__init__()
         self._model = model
         self._model.add(Conv2D(32,3,padding="same", activation="relu", input_shape=input_shape))
-        self._model.add(MaxPool2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+        self._model.add(MaxPool2D(pool_size=(2, 2), strides=(1, 1), padding='valid', data_format=None))
 
         self._model.add(Conv2D(32, 3, padding="same", activation="relu"))
-        self._model.add(MaxPool2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+        self._model.add(MaxPool2D(pool_size=(2, 2), strides=(1, 1), padding='valid', data_format=None))
 
         self._model.add(Conv2D(64, 3, padding="same", activation="relu"))
-        self._model.add(MaxPool2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+        self._model.add(MaxPool2D(pool_size=(2, 2), strides=(1, 1), padding='valid', data_format=None))
         self._model.add(Dropout(0.4))
     
     def fit(self, xt:np.array, yt:np.array, xv:np.array, yv:np.array, epochs:int=20, batch_size:int=128):
-        print(xt)
-        self._model.fit(xt,yt, validation_data=(xv, yv), epochs=epochs, batch_size=batch_size)
+        return self._model.fit((xt,yt), validation_data=(xv, yv), epochs=epochs, batch_size=batch_size)
     
-    def comile(self, opt):
-        self._model.compile(optimizer=opt, loss=sparse_categorical_crossentropy(from_logits=True), metrics=["accuracy"])
+    def mcompile(self, opt):
+        self._model().compile(optimizer=opt, loss=sparse_categorical_crossentropy(from_logits=True), metrics=["accuracy"])
 
     @property
     def model(self):

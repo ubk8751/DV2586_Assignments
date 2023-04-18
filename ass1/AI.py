@@ -57,8 +57,8 @@ def get_imgGPT():
     model = ImgGPT(mod, input_shape=(32,32,3))
     model.model.add(Flatten())
     model.model.add(Dense(10, activation='softmax'))
-    mod.compile(loss='categorical_crossentropy', optimizer='sgd')
-    return mod
+    model.mcompile(opt='sgd')
+    return model
 
 # To generate all three base models at a time
 def get_models():
