@@ -22,7 +22,7 @@ class ImgGPT(Model):
     def fit(self, xt:np.array, yt:np.array, xv:np.array, yv:np.array, epochs:int=20, batch_size:int=128):
         return self._model.fit((xt,yt), validation_data=(xv, yv), epochs=epochs, batch_size=batch_size)
     
-    def mcompile(self, opt):
+    def mcompile(self, opt=Adam(lr=0.000001)):
         self._model().compile(optimizer=opt, loss=sparse_categorical_crossentropy(from_logits=True), metrics=["accuracy"])
 
     @property
