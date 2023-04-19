@@ -7,7 +7,6 @@ from keras.applications.vgg19 import VGG19
 from keras.layers import *
 from keras.callbacks import *
 from keras.models import Sequential
-from keras.optimizers import Adam,SGD
 
 from imgGPT import ImgGPT
 
@@ -57,7 +56,8 @@ def get_imgGPT():
     model = ImgGPT(mod, input_shape=(32,32,3))
     model.model.add(Flatten())
     model.model.add(Dense(10, activation='softmax'))
-    model.mcompile(opt='sgd')
+    model.compile(opt='sgd', loss="categorical_crossentropy")
+    #model.build((1,32,32,3))
     return model
 
 # To generate all three base models at a time
