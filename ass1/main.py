@@ -37,6 +37,7 @@ if __name__ == "__main__":
 
     # Evaluate pre-trained models
     vgg_stat        = evaluate(vgg, fit_models[vgg], X_test, y_test)
+    print(vgg_stat)
     densenet_stat   = evaluate(densenet, fit_models[densenet], X_test, y_test)
     resnet_stat     = evaluate(resnet, fit_models[resnet], X_test, y_test)
     

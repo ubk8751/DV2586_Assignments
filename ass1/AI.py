@@ -7,18 +7,14 @@ from keras.applications.vgg19 import VGG19
 from keras.layers import *
 from keras.callbacks import *
 from keras.models import Sequential
+from keras.metrics import TruePositives, TrueNegatives, FalseNegatives, FalsePositives
+import eval
 
 from imgGPT import ImgGPT
 
 # Evaluate model
 def evaluate(model, hist, xv, yv):
-    ret = {
-        "score":    model.evaluate(xv, yv),
-        "accuracy": hist.history["accuracy"], 
-        "val_acc":  hist.history["val_accuracy"],
-        "loss":     hist.history["loss"],
-        "val_loss": hist.history["val_loss"]
-    }
+    ret = eval.evaluate(model, hist, xv, yv)
     return ret
 
 # Train model
@@ -27,7 +23,7 @@ def _build_model(mod):
     model.add(mod)
     model.add(Flatten())
     model.add(Dense(10, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy', "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"])
     return model
 
 # Fit model

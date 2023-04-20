@@ -1,6 +1,7 @@
 # Import libs
 from keras.optimizers import Adam
 from keras.layers import Conv2D,MaxPool2D,Dropout,BatchNormalization
+from keras.metrics import TruePositives, TrueNegatives, FalseNegatives, FalsePositives
 import tensorflow as tf
 
 class ImgGPT():
@@ -21,7 +22,7 @@ class ImgGPT():
         return self._model.fit(trainds, validation_data=valds, epochs=epochs, batch_size=batch_size)
     
     def compile(self, opt=Adam(learning_rate=0.000001), loss="categorical_crossentropy"):
-        self._model.compile(optimizer=opt, loss=loss, metrics=["accuracy"])
+        self._model.compile(optimizer=opt, loss=loss, metrics=["accuracy", "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"])
 
     def build(self, input_shape=(1, 32,32,3)):
         self._model.build(input_shape)
