@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import recall_score, precision_score
+from sklearn.metrics import recall_score, precision_score, confusion_matrix
 
 # Evaluate model
 def evaluate(model, hist, xv, yv):
@@ -11,6 +11,9 @@ def evaluate(model, hist, xv, yv):
         "val_loss": hist.history["val_loss"]
     }
     return ret
+
+def get_confusion_matrix(y_train, y_pred, normalize:bool=True):
+    pass
 
 # def _f1_score(model):
 #     precision_score
