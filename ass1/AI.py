@@ -2,6 +2,7 @@
 from keras.applications.resnet import ResNet50
 from keras.applications.densenet import DenseNet121
 from keras.applications.vgg19 import VGG19
+#from GitVGG19 import VGG19
 
 # Other
 from keras.layers import *
@@ -13,8 +14,8 @@ import eval
 from imgGPT import ImgGPT
 
 # Evaluate model
-def evaluate(model, hist, xv, yv):
-    ret = eval.evaluate(model, hist, xv, yv)
+def evaluate(hist, model, xv, yv):
+    ret = eval.evaluate(hist, model, xv, yv)
     return ret
 
 # Train model
@@ -23,7 +24,7 @@ def _build_model(mod):
     model.add(mod)
     model.add(Flatten())
     model.add(Dense(10, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy', "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"])
     return model
 
 # Fit model
@@ -33,27 +34,30 @@ def fit_model(mod, xt:np.array, yt:np.array, xv:np.array, yv:np.array, epochs:in
 
 # External for generating singular models
 def get_vgg():
-    mod = VGG19(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    print("Creating VGG-19")
+    mod = VGG19(weights=None, include_top=True, input_shape=(32,32,3), classes=10)
     model = _build_model(mod)
     return model
 
 def get_densenet():
-    mod = DenseNet121(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    print("\nCreating DenseNet")
+    mod = DenseNet121(weights=None, include_top=False, input_shape=(32,32,3))
     model = _build_model(mod)
     return model
 
 def get_resnet():
-    mod = ResNet50(weights='imagenet', include_top=False, input_shape=(32,32,3))
+    print("\nCreating ResNet50")
+    mod = ResNet50(weights=None, include_top=False, input_shape=(32,32,3))
     model = _build_model(mod)
     return model
 
 def get_imgGPT():
+    print("\nCreating imgGPT")
     mod = Sequential()
     model = ImgGPT(mod, input_shape=(32,32,3))
     model.model.add(Flatten())
     model.model.add(Dense(10, activation='softmax'))
     model.compile(opt='sgd', loss="categorical_crossentropy")
-    #model.build((1,32,32,3))
     return model
 
 # To generate all three base models at a time

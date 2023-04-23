@@ -3,7 +3,7 @@ import shutil
 import os
 import numpy as np
 from tqdm import tqdm
-from keras.utils import load_img,  img_to_array, to_categorical
+from keras.utils import load_img, img_to_array, to_categorical
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
