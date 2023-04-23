@@ -6,6 +6,7 @@ from tqdm import tqdm
 from keras.utils import load_img, img_to_array, to_categorical
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+from PIL import Image
 
 # Create for sets of data
 def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, num_classes:int=10):
@@ -23,7 +24,9 @@ def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, 
 
     # Fancy schmancy prog bar while handling images
     for i in tqdm(range(len(paths))):
-        img = load_img(paths[i], target_size=(32,32,3), grayscale=False)
+        #img = load_img(paths[i], target_size=(32,32,3), grayscale=False)
+        img = Image.open(paths[i])
+        img.resize((32,32))
         img = img_to_array(img)
         img.astype('float32')
         img = img/255
