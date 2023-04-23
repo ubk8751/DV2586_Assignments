@@ -24,28 +24,30 @@ if __name__ == "__main__":
     
     #Train pre-trained models
     vgg      = get_vgg()
-    densenet = get_densenet() 
-    resnet   = get_resnet()
-
-    # Fit pre-trained models
-    fit_vgg      = fit_model(vgg, X_train, y_train, X_test, y_test)
-    fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test)
-    fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test)
+    #densenet = get_densenet() 
+    #resnet   = get_resnet()
+    # Create the ultimate image recognition AI architecture
+    #imggpt   = get_imgGPT()
 
     # VGG Confusion matrix
     vgg_cm = get_confusion_matrix(vgg, x_test=X_test, y_test=y_test)
     print(vgg_cm)
+    if del_data:
+        remove(tds_name)
+        remove(vds_name)
     exit()
-    # Create the ultimate image recognition AI architecture
-    imggpt = get_imgGPT()
 
+    # Fit pre-trained models
+    fit_vgg      = fit_model(vgg, X_train, y_train, X_test, y_test, path=data_path)
+    fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test, path=data_path)
+    fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test, path=data_path)
     # Fit the ultimate image recognition AI architecture
-    fitimggpt = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128)
-
+    fitimggpt    = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128, path=data_path)
+    
     # Evaluate pre-trained models
     vgg_stat        = evaluate(fit_vgg, vgg, X_train, y_train)
-    densenet_stat   = evaluate(fit_densenet, densenet, X_train, y_train)
-    resnet_stat     = evaluate(fit_resnet, resnet, X_train, y_train)
+    densenet_stat   = evaluate(fit, densenet, X_train, y_train)
+    resnet_stat     = evaluate(fit_models[resnet], resnet, X_train, y_train)
     ImgGPT_stat     = evaluate(fitimggpt, imggpt, X_train, y_train)
     
     print("{: <15} {: <15} {: <15} {: <15}".format("Model", "Accuracy", "Loss",  "F1 score"))

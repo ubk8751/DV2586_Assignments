@@ -1,8 +1,8 @@
 # Models
 from keras.applications.resnet import ResNet50
 from keras.applications.densenet import DenseNet121
-from keras.applications.vgg19 import VGG19
-#from GitVGG19 import VGG19
+#from keras.applications.vgg19 import VGG19
+from GitVGG19 import VGG19
 
 # Other
 from keras.layers import *
@@ -10,8 +10,8 @@ from keras.callbacks import *
 from keras.models import Sequential
 from keras.metrics import TruePositives, TrueNegatives, FalseNegatives, FalsePositives
 import eval
-
 from imgGPT import ImgGPT
+from data import get_class_weights
 
 # Evaluate model
 def evaluate(hist, model, xv, yv):
@@ -28,8 +28,8 @@ def _build_model(mod):
     return model
 
 # Fit model
-def fit_model(mod, xt:np.array, yt:np.array, xv:np.array, yv:np.array, epochs:int=20, batch_size:int=128):
-    fitmod = mod.fit(xt, yt, epochs=epochs, batch_size=batch_size, validation_data=(xv, yv))
+def fit_model(mod, xt:np.array, yt:np.array, xv:np.array, yv:np.array, epochs:int=20, batch_size:int=128, path:str="ass1/DIDA.ds"):
+    fitmod = mod.fit(xt, yt, epochs=epochs, batch_size=batch_size, validation_data=(xv, yv), class_weight=get_class_weights(path))
     return fitmod
 
 # External for generating singular models

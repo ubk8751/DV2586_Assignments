@@ -35,9 +35,26 @@ def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, 
 
     #Split data into various data sets
     X_train, X_test, y_train, y_test = train_test_split(images, y, random_state=rs, test_size=ts)
-    print(y_train.shape, y_test.shape)
 
     return X_train, X_test, y_train, y_test
+
+def get_class_weights(input_directory:str="./ass1/DIDA"):
+    paths, labels, images =  ([] for i in range(3))
+    folders=os.listdir(input_directory)
+    class_weights = {}
+    num = 0
+    # Fetch images  
+    for folder in folders:
+        path=os.path.join(input_directory, folder)
+        flist=os.listdir(path)
+        count = 0
+        for f in flist:
+            count += 1
+        class_weights[num] = 1.0/count
+    return class_weights
+        
+
+    
 
 # Create training tensorflow dataset
 def create_tds(X_train, y_train, tds_name:str="trainds.tfds", buffer_size:int=10, batches:int=2):
