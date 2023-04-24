@@ -16,7 +16,7 @@ def evaluate(hist, model, xv, yv):
 def get_confusion_matrix(model, x_test, y_test):
     #Predict
     y_prediction = model.predict(x_test)
-    y_prediction = np.argmax (y_prediction, axis = 1)
+    y_prediction = np.argmax(y_prediction, axis = 1)
     y_test=np.argmax(y_test, axis=1)
     #Create confusion matrix and normalizes it over predicted (columns)
     result = confusion_matrix(y_test, y_prediction , normalize='pred')
@@ -25,14 +25,15 @@ def get_confusion_matrix(model, x_test, y_test):
 def _f1_score(hist):
     tp = hist.history["true_positives"][-1]
     fp = hist.history["false_positives"][-1]
-    tn = hist.history["true_negatives"][-1]
     fn = hist.history["false_negatives"][-1]
-    if tp == 0.0 or fp == 0.0:    
+    if tp == 0.0 or fp == 0.0 or fn == 0:    
         if tp == 0.0:
             print("Model has 0 true positives")
         if fp == 0.0:
             print("Model has 0 false positives")
-        if tp == 0.0 and fp == 0.0:
+        if fn == 0.0:
+            print("Model has 0 false negatives")
+        if (tp == 0.0 and fp == 0.0) or (tp == 0 and fn == 0):
             return 0
     precision = tp/(tp+fp)
     recall = tp/(tp+fn)

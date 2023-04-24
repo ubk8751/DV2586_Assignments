@@ -3,10 +3,9 @@ import shutil
 import os
 import numpy as np
 from tqdm import tqdm
-from keras.utils import load_img, img_to_array, to_categorical
+from keras.utils import load_img, img_to_array, to_categorical, image_dataset_from_directory
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-from PIL import Image
 
 # Create for sets of data
 def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, num_classes:int=10):
@@ -24,9 +23,7 @@ def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, 
 
     # Fancy schmancy prog bar while handling images
     for i in tqdm(range(len(paths))):
-        #img = load_img(paths[i], target_size=(32,32,3), grayscale=False)
-        img = Image.open(paths[i])
-        img.resize((32,32))
+        img = load_img(paths[i], target_size=(32,32,3), grayscale=False)
         img = img_to_array(img)
         img.astype('float32')
         img = img/255
@@ -41,11 +38,10 @@ def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, 
 
     return X_train, X_test, y_train, y_test
 
-def get_class_weights(input_directory:str="./ass1/DIDA"):
-    paths, labels, images =  ([] for i in range(3))
+def _get_beegest_class(input_directory:str="./ass1/MiniDIDA"):
     folders=os.listdir(input_directory)
-    class_weights = {}
-    num = 0
+    temp = {}
+    counts = []
     # Fetch images  
     for folder in folders:
         path=os.path.join(input_directory, folder)
@@ -53,11 +49,25 @@ def get_class_weights(input_directory:str="./ass1/DIDA"):
         count = 0
         for f in flist:
             count += 1
-        class_weights[num] = 1.0/count
-    return class_weights
-        
+        temp[folder] = count
+        counts.append([folder, count])
+    m = 0
+    k = "0"
+    for i in counts:
+        if i[1] > m:
+            m = i[1]
+            k = str(i[0])
+    del temp[k]
+    return temp, m
 
+
+def get_class_weights(input_directory:str="./ass1/MiniDIDA.ds"):
+    class_weights = {}
+    temp_dict, max_val = _get_beegest_class(input_directory)
+    for key in temp_dict:
+        class_weights[key] = max_val/temp_dict[key]
     
+    return class_weights
 
 # Create training tensorflow dataset
 def create_tds(X_train, y_train, tds_name:str="trainds.tfds", buffer_size:int=10, batches:int=2):
@@ -79,17 +89,10 @@ def create_vds(X_test, y_test, vds_name:str="validationds.tfds", buffer_size:int
     valds.save(vds_name)
     return valds
 
-# Normalize data?
-def data_normalization(xt, xv):
-    x_train = xt
-    x_val = xv
-    x_train = np.array(xt)/255
-    x_train.reshape(-1, 32, 32, 1)
-    x_val = np.array(xv)/255
-    x_val.reshape(-1, 32, 32, 1)
-    return x_train, x_val
-
 def remove(path:str="/TrainingDataSet.tfds"):
     if os.path.exists(path):
         shutil.rmtree(path, ignore_errors=True)
         print(f'Removed {path}')
+
+if __name__ == "__main__":
+    print(get_class_weights())

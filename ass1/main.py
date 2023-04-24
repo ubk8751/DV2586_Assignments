@@ -16,11 +16,11 @@ del_data  = True
 # Run the program
 if __name__ == "__main__":
     # Create the data sets
-    X_train, X_test, y_train, y_test = create_data_set(data_path, rs=42, ts=0.2, num_classes=10)
+    X_train, X_test, y_train, y_test = create_data_set(data_path, ts=0.2)
     
     # Turn them into tensorflow datasets
-    tds = create_tds(X_train=X_train, y_train=y_train, tds_name="TrainingDataSet.tfds", buffer_size=10, batches=2)
-    vds = create_vds(X_test=X_test, y_test=y_test, vds_name="ValidationDataSet.tfds", buffer_size=10, batches=2)
+    tds = create_tds(X_train=X_train, y_train=y_train, tds_name=tds_name, buffer_size=10, batches=2)
+    vds = create_vds(X_test=X_test, y_test=y_test, vds_name=vds_name, buffer_size=10, batches=2)
     
     #Train pre-trained models
     vgg      = get_vgg()
@@ -31,30 +31,30 @@ if __name__ == "__main__":
 
     # VGG Confusion matrix
     vgg_cm = get_confusion_matrix(vgg, x_test=X_test, y_test=y_test)
-    print(vgg_cm)
-    if del_data:
-        remove(tds_name)
-        remove(vds_name)
-    exit()
+    for row in vgg_cm:
+        print("[", end="")
+        for itm in row:
+            print(f'{itm}, ', end="")
+        print("]")
 
     # Fit pre-trained models
-    fit_vgg      = fit_model(vgg, X_train, y_train, X_test, y_test, path=data_path)
-    fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test, path=data_path)
-    fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test, path=data_path)
+    fit_vgg      = fit_model(vgg, X_train, y_train, X_test, y_test, path=data_path, use_CW=False)
+    #fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test, path=data_path)
+    #fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test, path=data_path)
     # Fit the ultimate image recognition AI architecture
-    fitimggpt    = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128, path=data_path)
+    #fitimggpt    = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128, path=data_path)
     
     # Evaluate pre-trained models
     vgg_stat        = evaluate(fit_vgg, vgg, X_train, y_train)
-    densenet_stat   = evaluate(fit, densenet, X_train, y_train)
-    resnet_stat     = evaluate(fit_models[resnet], resnet, X_train, y_train)
-    ImgGPT_stat     = evaluate(fitimggpt, imggpt, X_train, y_train)
+    #densenet_stat   = evaluate(fit, densenet, X_train, y_train)
+    #resnet_stat     = evaluate(fit_models[resnet], resnet, X_train, y_train)
+    #ImgGPT_stat     = evaluate(fitimggpt, imggpt, X_train, y_train)
     
     print("{: <15} {: <15} {: <15} {: <15}".format("Model", "Accuracy", "Loss",  "F1 score"))
     print_stat_row(vgg_stat, "VGG-19")
-    print_stat_row(densenet_stat, "DenseNet")
-    print_stat_row(resnet_stat, "ResNet50")
-    print_stat_row(ImgGPT_stat, "ImgGPT")
+    #print_stat_row(densenet_stat, "DenseNet")
+    #print_stat_row(resnet_stat, "ResNet50")
+    #print_stat_row(ImgGPT_stat, "ImgGPT")
     if del_data:
         remove(tds_name)
         remove(vds_name)
