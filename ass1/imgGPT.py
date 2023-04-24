@@ -23,7 +23,7 @@ class ImgGPT():
         self._model.add(Dropout(0.4))
     
     def fit(self, trainds:tf.data.Dataset, valds:tf.data.Dataset, epochs:int=20, batch_size:int=128, path:str="./ass1/DIDA.ds"):
-        return self._model.fit(trainds, validation_data=valds, epochs=epochs, batch_size=batch_size, class_weight=get_class_weights(path)) 
+        return self._model.fit(trainds, validation_data=valds, epochs=epochs, batch_size=batch_size) 
     
     def compile(self, opt=Adam(learning_rate=0.000001), loss="categorical_crossentropy"):
         self._model.compile(optimizer=opt, loss=loss, metrics=["accuracy", "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"])

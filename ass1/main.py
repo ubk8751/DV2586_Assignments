@@ -1,6 +1,6 @@
 # Self-made modules
 from AI import get_imgGPT, fit_model, get_models, evaluate, get_vgg, get_resnet, get_densenet
-from data import create_data_set, create_tds, create_vds, remove
+from data import create_data_set, create_tds, create_vds, remove, create_data_set_from_directory
 from eval import print_stat_row, get_confusion_matrix
 
 # External libs
@@ -17,10 +17,13 @@ del_data  = True
 if __name__ == "__main__":
     # Create the data sets
     X_train, X_test, y_train, y_test = create_data_set(data_path, ts=0.2)
+    # trainds, valds = create_data_set_from_directory(data_path, vs=0.2)
+    # trainds.save(tds_name)
+    # valds.save(vds_name)
     
     # Turn them into tensorflow datasets
-    tds = create_tds(X_train=X_train, y_train=y_train, tds_name=tds_name, buffer_size=10, batches=2)
-    vds = create_vds(X_test=X_test, y_test=y_test, vds_name=vds_name, buffer_size=10, batches=2)
+    #tds = create_tds(X_train=X_train, y_train=y_train, tds_name=tds_name, buffer_size=10, batches=2)
+    #vds = create_vds(X_test=X_test, y_test=y_test, vds_name=vds_name, buffer_size=10, batches=2)
     
     #Train pre-trained models
     vgg      = get_vgg()
@@ -38,14 +41,14 @@ if __name__ == "__main__":
         print("]")
 
     # Fit pre-trained models
-    fit_vgg      = fit_model(vgg, X_train, y_train, X_test, y_test, path=data_path, use_CW=False)
+    #fit_vgg      = fit_model(vgg, X_train, X_test, y_train, y_test, path=data_path, use_CW=False)
     #fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test, path=data_path)
     #fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test, path=data_path)
     # Fit the ultimate image recognition AI architecture
     #fitimggpt    = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128, path=data_path)
     
     # Evaluate pre-trained models
-    vgg_stat        = evaluate(fit_vgg, vgg, X_train, y_train)
+    vgg_stat        = evaluate(fit_vgg, vgg, X_test,y_test)
     #densenet_stat   = evaluate(fit, densenet, X_train, y_train)
     #resnet_stat     = evaluate(fit_models[resnet], resnet, X_train, y_train)
     #ImgGPT_stat     = evaluate(fitimggpt, imggpt, X_train, y_train)

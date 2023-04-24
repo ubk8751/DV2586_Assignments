@@ -6,6 +6,13 @@ from tqdm import tqdm
 from keras.utils import load_img, img_to_array, to_categorical, image_dataset_from_directory
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+import cv2
+import pandas as pd
+
+def create_data_set_from_directory(dir:str="./ass1/MiniDIDA.ds", vs:int=0.2):
+    trainds, valds = image_dataset_from_directory(directory=dir, validation_split=vs, subset="both", seed=123, image_size=(32,32))
+    return trainds, valds
+
 
 # Create for sets of data
 def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, num_classes:int=10):
@@ -95,4 +102,4 @@ def remove(path:str="/TrainingDataSet.tfds"):
         print(f'Removed {path}')
 
 if __name__ == "__main__":
-    print(get_class_weights())
+    create_data_set_from_directory()
