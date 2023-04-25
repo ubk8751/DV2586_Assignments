@@ -41,11 +41,11 @@ if __name__ == "__main__":
         print("]")
 
     # Fit pre-trained models
-    #fit_vgg      = fit_model(vgg, X_train, X_test, y_train, y_test, path=data_path, use_CW=False)
-    #fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test, path=data_path)
-    #fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test, path=data_path)
+    fit_vgg      = fit_model(vgg, X_train, X_test, y_train, y_test, path=data_path, use_CW=False)
+    #fit_densenet = fit_model(densenet, X_train, y_train, X_test, y_test, path=data_path, use_cw=False)
+    #fit_resnet   = fit_model(resnet, X_train, y_train, X_test, y_test, path=data_path, use_cw=False)
     # Fit the ultimate image recognition AI architecture
-    #fitimggpt    = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128, path=data_path)
+    #fitimggpt    = imggpt.fit(trainds=tds, valds=vds, epochs=20, batch_size=128, path=data_path, use_cw=False)
     
     # Evaluate pre-trained models
     vgg_stat        = evaluate(fit_vgg, vgg, X_test,y_test)

@@ -1,9 +1,9 @@
 # Models
 from keras.applications.resnet import ResNet50
 from keras.applications.densenet import DenseNet121
-#from keras.applications.vgg19 import VGG19
+from keras.applications.vgg19 import VGG19
 #from GitVGG19 import VGG19
-from PyVGG.train import tmain
+#from PyVGG.train import tmain
 
 # Other
 from keras.layers import *
@@ -40,12 +40,13 @@ def fit_model(mod, xt, xv, yt, yv, epochs:int=20, batch_size:int=128, path:str="
 # External for generating singular models
 def get_vgg():
     print("Creating VGG-19")
-    mod = tmain(0)
-    #model = Sequential()
-    #model.add(mod)
+    mod = VGG19(weights=None, classes=10)
+    #mod = tmain(0)
+    model = Sequential()
+    model.add(mod)
     #model.add(Flatten())
     #model.add(Dense(10, activation='softmax'))
-    #mod.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy', "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"]) #
+    mod.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy', "TrueNegatives", "TruePositives", "FalseNegatives", "FalsePositives"]) #
     #model = _build_model(mod)
     return mod
 

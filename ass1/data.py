@@ -15,7 +15,7 @@ def create_data_set_from_directory(dir:str="./ass1/MiniDIDA.ds", vs:int=0.2):
 
 
 # Create for sets of data
-def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, num_classes:int=10):
+def create_data_set(input_directory:str="./ass1/MiniDIDA", rs:int=42, ts:float=0.2, num_classes:int=10):
     paths, labels, images =  ([] for i in range(3))
     folders=os.listdir(input_directory)
 
@@ -30,7 +30,7 @@ def create_data_set(input_directory:str="./ass1/DIDA", rs:int=42, ts:float=0.2, 
 
     # Fancy schmancy prog bar while handling images
     for i in tqdm(range(len(paths))):
-        img = load_img(paths[i], target_size=(32,32,3), grayscale=False)
+        img = load_img(paths[i], target_size=(224,224,3), grayscale=False)
         img = img_to_array(img)
         img.astype('float32')
         img = img/255
