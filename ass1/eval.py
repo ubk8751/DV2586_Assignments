@@ -3,9 +3,9 @@ from sklearn.metrics import confusion_matrix
 from keras.preprocessing.image import ImageDataGenerator
 
 # Evaluate model
-def evaluate(hist, model, xv,yv):
+def evaluate(hist, model, valds):
     ret = {
-        "eval":     model.evaluate(xv,yv, batch_size=128),
+        "eval":     model.evaluate(valds, batch_size=128),
         "accuracy": hist.history["accuracy"][-1], 
         "val_acc":  hist.history["val_accuracy"][-1],
         "loss":     hist.history["loss"][-1],
@@ -42,12 +42,9 @@ def get_confusion_matrix(model, x_test, y_test):
     y_prediction = model.predict(x_test)
     y_prediction = np.argmax(y_prediction, axis = 1)
     y_test=np.argmax(y_test, axis=1)
+    
     # Create confusion matrix and normalizes it over predicted (columns)
     result = confusion_matrix(y_test, y_prediction , normalize='pred')
-    # train_generator, validation_generator = _generator(tpath, vpath, img_rows=32, img_cols=32, batch_size=32)
-    # Y_pred = model.predict_generator(validation_generator, num_of_test_samples // batch_size+1)
-    # y_pred = np.argmax(Y_pred, axis=1)
-    # result = confusion_matrix(validation_generator.classes, y_pred)
     return result
 
 def _f1_score(hist):
