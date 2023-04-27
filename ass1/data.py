@@ -22,12 +22,7 @@ def to_grayscale(image, label):
     image = tf.image.rgb_to_grayscale(image)
     return image, label
 
-def create_data(path : str, cache : str = None):
-    if cache and os.path.exists(cache):
-        t_ds = tf.data.Dataset.load(os.path.join(cache, 'train.tfds'))
-        v_ds = tf.data.Dataset.load(os.path.join(cache, 'validation.tfds'))
-        return t_ds, v_ds
-
+def create_data(path : str):
     if not os.path.exists(path):
         raise Exception(f'Cannot find path to images: "{path}"')
     print(f'Found folder with images: "{path}"')
@@ -59,11 +54,6 @@ def create_data(path : str, cache : str = None):
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )
-
-    if cache and not os.path.exists(cache):
-        os.makedirs(cache)
-        dataset.save(os.path.join(cache, 'train.tfds'))
-        validation_data.save(os.path.join(cache, 'validation.tfds'))
     return dataset, validation_data
 
 def remove(path:str="/TrainingDataSet.tfds"):

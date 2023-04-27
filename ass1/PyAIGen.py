@@ -1,5 +1,9 @@
+# Training and Visualization functions are edited versions of the tutorial for PyTorch 
+# Transfer learning:
+# https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html 
 # License: BSD
 # Author: Sasank Chilamkurthy
+
 from __future__ import print_function, division
 import torch
 import torch.nn as nn
