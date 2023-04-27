@@ -19,12 +19,34 @@ import copy
 
 from constants import constant
 
-c = constant('./ass1/MiniDIDA.ds')
+c = constant('./ass1/DIDA.ds')
 cudnn.benchmark = True
 plt.ion()   # interactive mode
 criterion = nn.CrossEntropyLoss()
 inputs, classes = next(iter(c.dataloader['train']))
 out = torchvision.utils.make_grid(inputs)
+
+def _boundle_stats(conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN, F1):
+    true_TP = 0
+    for item in TP.tolist():
+        true_TP += item
+    stats = {
+        "conf_matrix"   : conf_matrix,
+        "accuracy"      : accuracy.item(),
+        "accuracies"    : [x.item() for x in acc_list],
+        "val_acc"       : val_acc.item(),
+        "val_accs"      : [x.item() for x in val_acc_list],
+        "loss"          : loss.item(),
+        "losses"        : loss_list,
+        "val_loss"      : val_loss,
+        "val_losses"    : val_loss_list,
+        "TP"            : true_TP,
+        "FP"            : FP.item(),
+        "TN"            : TN.item(),
+        "FN"            : FN.item(),
+        "F1"            : F1
+    }
+    return stats
 
 def imshow(inp, title=None):
     """Display image for Tensor."""
@@ -70,6 +92,10 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+    acc_list = []
+    val_acc_list = []
+    loss_list = []
+    val_loss_list = []
 
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
@@ -105,6 +131,12 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                 scheduler.step()
             epoch_loss = running_loss / c.dataset_sizes[phase]
             epoch_acc = running_corrects.double() / c.dataset_sizes[phase]
+            if phase == 'train':
+                acc_list.append(epoch_acc)
+                loss_list.append(epoch_loss)
+            if phase == 'val':
+                val_acc_list.append(epoch_acc)
+                val_loss_list.append(epoch_loss)
             print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
@@ -118,7 +150,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     conf_matrix, TP, TN, FP, FN = get_confusion_matrix(output=output, nb_classes=10)
     # load best model weights
     model.load_state_dict(best_model_wts)
-    return model, conf_matrix, TP, TN, FP, FN
+    return model, conf_matrix, best_acc, acc_list, max(val_acc_list), val_acc_list, loss, loss_list, min(val_loss_list), val_loss_list, TP, TN, FP, FN
 
 def visualize_model(model, num_images=6):
     was_training = model.training
@@ -166,20 +198,23 @@ def calc_f1(TP, TN, FP, FN):
     return 2*((precision*recall)/(precision+recall))
 
 def vgg19(num_epochs:int=25, lr:float=0.001, momentum:float=0.9, step_size:int=7, gamma:float=0.1, v_model:bool=False):
+    print("Creating VGG-19")
     vgg = models.vgg19(weights = None)
-    num_ftrs = vgg.fc.in_features
+    num_ftrs = vgg.classifier[6].in_features
     out_sample = len(c.class_names)
     vgg.fc = nn.Linear(num_ftrs, out_sample)
     vgg = vgg.to(c.device)
     optimizer_ft = optim.SGD(vgg.parameters(), lr=lr, momentum=momentum)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=step_size, gamma=gamma)
-    vgg, conf_matrix, TP, TN, FP, FN = train_model(vgg, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=num_epochs)
+    vgg, conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN = train_model(vgg, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=num_epochs)
     F1 = calc_f1(TP, TN, FP, FN)
+    stats = _boundle_stats(conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN, F1)
     if v_model:
         visualize_model(vgg)
-    return vgg, conf_matrix, TP, TN, FP, FN, F1
+    return vgg, stats
 
 def ResNet50(num_epochs:int=25, lr:float=0.001, momentum:float=0.9, step_size:int=7, gamma:float=0.1, v_model:bool=False):
+    print("Creating ResNet50")
     RN50 = models.resnet50(weights = None)
     num_ftrs = RN50.fc.in_features
     out_sample = len(c.class_names)
@@ -187,39 +222,43 @@ def ResNet50(num_epochs:int=25, lr:float=0.001, momentum:float=0.9, step_size:in
     RN50 = RN50.to(c.device)
     optimizer_ft = optim.SGD(RN50.parameters(), lr=lr, momentum=momentum)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=step_size, gamma=gamma)
-    RN50, conf_matrix, TP, TN, FP, FN = train_model(RN50, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=num_epochs)
+    RN50, conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN = train_model(RN50, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=num_epochs)
     F1 = calc_f1(TP, TN, FP, FN)
+    stats = _boundle_stats(conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN, F1)
     if v_model:
         visualize_model(RN50)
-    return RN50, conf_matrix, TP, TN, FP, FN, F1
+    return RN50, stats
 
 def DenseNet(num_epochs:int=25, lr:float=0.001, momentum:float=0.9, step_size:int=7, gamma:float=0.1, v_model:bool=False):
-    DN = models.DenseNet(weights = None)
-    num_ftrs = DN.fc.in_features
+    print("Creating DenseNet")
+    DN = models.densenet121(weights = None)
+    num_ftrs = len(DN.features)
     out_sample = len(c.class_names)
     DN.fc = nn.Linear(num_ftrs, out_sample)
     DN = DN.to(c.device)
     optimizer_ft = optim.SGD(DN.parameters(), lr=lr, momentum=momentum)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=step_size, gamma=gamma)
-    DN, conf_matrix, TP, TN, FP, FN = train_model(DN, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=num_epochs)
+    DN, conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN = train_model(DN, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=num_epochs)
     F1 = calc_f1(TP, TN, FP, FN)
+    stats = _boundle_stats(conf_matrix, accuracy, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN, F1)
     if v_model:    
         visualize_model(DN)
-    return DN, conf_matrix, TP, TN, FP, FN, F1
+    return DN, stats
 
 # Main function to test module
 def main():
-    model_ft = models.resnet50(weights=None)
-    num_ftrs = model_ft.fc.in_features
+    model_ft = models.vgg19(weights=None)
+    num_ftrs = model_ft.classifier[6].in_features
     out_sample = len(c.class_names)
     model_ft.fc = nn.Linear(num_ftrs, out_sample)
     model_ft = model_ft.to(c.device) 
     optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
-    model_ft, conf_matrix, TP, TN, FP, FN, F1 = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                        num_epochs=1)
+    model, conf_matrix, best_acc, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
+                        num_epochs=5)
     F1 = calc_f1(TP, TN, FP, FN)
-    print("FF = " + str(F1))
+    stats = _boundle_stats(conf_matrix, best_acc, acc_list, val_acc, val_acc_list, loss, loss_list, val_loss, val_loss_list, TP, TN, FP, FN, F1)
+    print(stats)
     visualize_model(model_ft)
     
     plt.ioff()

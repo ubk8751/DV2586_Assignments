@@ -1,7 +1,8 @@
 # Import libs
 from keras.optimizers import Adam
-from keras.layers import Conv2D,MaxPool2D,Dropout,BatchNormalization,Dense
+from keras.layers import Conv2D,MaxPool2D,Dropout,BatchNormalization,Dense,Flatten
 import tensorflow as tf
+from keras.models import Sequential
 
 class ImgGPT():
     def __init__(self, model, input_shape=(32,32,3)):
@@ -9,13 +10,21 @@ class ImgGPT():
         self._model.add(BatchNormalization())
         self._model.add(Dense(32,activation="relu"))
         self._model.add(Conv2D(32,3,padding="same", activation="relu", input_shape=input_shape))
+        self._model.add(Conv2D(32,3,padding="same", activation="relu", input_shape=input_shape))
+        self._model.add(Conv2D(32,3,padding="same", activation="relu", input_shape=input_shape))
         self._model.add(MaxPool2D(pool_size=(2, 2), strides=(1, 1), padding='valid', data_format=None))
 
+        self._model.add(BatchNormalization())
+        self._model.add(Conv2D(32, 3, padding="same", activation="relu"))
         self._model.add(Conv2D(32, 3, padding="same", activation="relu"))
         self._model.add(MaxPool2D(pool_size=(2, 2), strides=(1, 1), padding='valid', data_format=None))
 
+        self._model.add(BatchNormalization())
+        self._model.add(Conv2D(64, 3, padding="same", activation="relu"))
+        self._model.add(Conv2D(64, 3, padding="same", activation="relu"))
         self._model.add(Conv2D(64, 3, padding="same", activation="relu"))
         self._model.add(MaxPool2D(pool_size=(2, 2), strides=(1, 1), padding='valid', data_format=None))
+        
         self._model.add(Dense(32,activation="relu"))
         self._model.add(Dropout(0.4))
     
@@ -28,20 +37,37 @@ class ImgGPT():
     def summary(self):
         return self._model.summary()
     
-    def evaluate(self, valds, hist, model, batch_size:int=128):
+    def vgg_evaluate(self, valds, hist, model, batch_size:int=128):
         ret = {
-            "eval":     model.evaluate(valds, batch_size=128),
+            "eval"    : model.evaluate(valds),
             "accuracy": hist.history["accuracy"][-1], 
-            "val_acc":  hist.history["val_accuracy"][-1],
-            "loss":     hist.history["loss"][-1],
+            "val_acc" : hist.history["val_accuracy"][-1],
+            "loss"    : hist.history["loss"][-1],
             "val_loss": hist.history["val_loss"][-1],
-            "f1_score": _f1_score(hist=hist)
+            "TP"      : hist.history["true_positives"][-1],
+            "FP"      : hist.history["false_positives"][-1],
+            "TN"      : hist.history["true_negatives"][-1],
+            "FN"      : hist.history["false_negatives"][-1],
+            "F1"      : _f1_score(hist=hist)
         }
-        return ret        
+        return ret
+
+    def evaluate(self, valds):
+        return self._model.evaluate(valds)     
     
     @property
     def model(self):
         return self._model
+
+def get_imgGPT():
+    print("\nCreating imgGPT")
+    mod = Sequential()
+    model = ImgGPT(mod, input_shape=(64,64,1))
+    model.model.add(Flatten())
+    model.model.add(Dense(10, activation='softmax'))
+    model.compile(opt='sgd', loss="categorical_crossentropy")
+    return model
+
 def _f1_score(hist):
     tp = hist.history["true_positives"][-1]
     fp = hist.history["false_positives"][-1]

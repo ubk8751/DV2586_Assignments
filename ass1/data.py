@@ -2,6 +2,8 @@ import os
 from tqdm import tqdm
 import tensorflow as tf
 import shutil
+from torch.utils.data import Subset
+from sklearn.model_selection import train_test_split
 
 image_dimensions = (64, 64)
 batch_size = 2
@@ -42,7 +44,7 @@ def create_data(path : str):
         # dataset.take(20)
         validation_data
         .map(scale_values)
-        .map(to_grayscale)
+        #.map(to_grayscale)
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )
@@ -50,7 +52,7 @@ def create_data(path : str):
     dataset = (
         dataset
         .map(scale_values)
-        .map(to_grayscale)
+        #.map(to_grayscale)
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )
@@ -60,3 +62,13 @@ def remove(path:str="/TrainingDataSet.tfds"):
     if os.path.exists(path):
         shutil.rmtree(path, ignore_errors=True)
         print(f'Removed {path}')
+
+def train_val_dataset(dataset, val_split=0.3):
+    train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=val_split)
+    datasets = {}
+    datasets['train'] = Subset(dataset, train_idx)
+    datasets['val'] = Subset(dataset, val_idx)
+    return datasets
+
+def print_stat_row(stat, name):
+    print(f'{name:<15} {stat["accuracy"]:<15.5f} {stat["val_acc"]:<15.5f} {stat["loss"]:<15.5f} {stat["val_loss"]:<15.5f} {stat["TP"]:<15.5f} {stat["FP"]:<15.5f} {stat["TN"]:<15.5f} {stat["FN"]:<15.5f} {stat["F1"]:<15.5f}'.format(name,stat["accuracy"],stat["val_acc"],stat["loss"],stat["val_loss"],stat["TP"],stat["FP"],stat["TN"],stat["FN"],stat["F1"]))

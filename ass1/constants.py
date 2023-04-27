@@ -1,6 +1,9 @@
 import os
 import torch
+from torchvision.datasets import ImageFolder
+from torchvision.transforms import Compose, ToTensor, Resize
 from torchvision import transforms, datasets
+from data import train_val_dataset
 
 class constant():
     def __init__(self, dir):
@@ -19,11 +22,12 @@ class constant():
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ]),
         }
-        self._image_datasets = {x: datasets.ImageFolder(os.path.join(self._data_dir, x), self._data_transform[x]) for x in ['train', 'val']}
-        self._dataloader = {x: torch.utils.data.DataLoader(self._image_datasets[x], batch_size=4, shuffle=True) for x in ['train', 'val']}
+        self._image_datasets = train_val_dataset(ImageFolder(self._data_dir, transform=Compose([Resize((224,224)),ToTensor()])))
+        self._dataloader ={x: torch.utils.data.DataLoader(self._image_datasets[x], batch_size=4, shuffle=True) for x in ['train', 'val']}
         self._dataset_sizes = {x: len(self._image_datasets[x]) for x in ['train', 'val']}
-        self._class_names = self._image_datasets['train'].classes
+        self._class_names = self._image_datasets['train'].dataset.classes
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self._dataset = dataset = ImageFolder(self._data_dir, transform=Compose([Resize((224,224)),ToTensor()]))
         
     @property
     def data_dir(self):
@@ -46,3 +50,6 @@ class constant():
     @property
     def device(self):
         return self._device
+    @property
+    def dataset(self):
+        return self._dataset
