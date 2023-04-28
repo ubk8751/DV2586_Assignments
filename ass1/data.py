@@ -35,7 +35,7 @@ def create_data(path : str):
         shuffle=False,
         batch_size=None, 
         image_size=image_dimensions,
-        validation_split=0.2,
+        validation_split=0.3,
         subset='both'
         )
 
@@ -44,7 +44,7 @@ def create_data(path : str):
         # dataset.take(20)
         validation_data
         .map(scale_values)
-        #.map(to_grayscale)
+        .map(to_grayscale)
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )
@@ -52,7 +52,7 @@ def create_data(path : str):
     dataset = (
         dataset
         .map(scale_values)
-        #.map(to_grayscale)
+        .map(to_grayscale)
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )

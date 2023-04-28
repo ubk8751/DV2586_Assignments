@@ -23,7 +23,7 @@ class constant():
             ]),
         }
         self._image_datasets = train_val_dataset(ImageFolder(self._data_dir, transform=Compose([Resize((224,224)),ToTensor()])))
-        self._dataloader ={x: torch.utils.data.DataLoader(self._image_datasets[x], batch_size=4, shuffle=True) for x in ['train', 'val']}
+        self._dataloader ={x: torch.utils.data.DataLoader(self._image_datasets[x], batch_size=1024, shuffle=True) for x in ['train', 'val']}
         self._dataset_sizes = {x: len(self._image_datasets[x]) for x in ['train', 'val']}
         self._class_names = self._image_datasets['train'].dataset.classes
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

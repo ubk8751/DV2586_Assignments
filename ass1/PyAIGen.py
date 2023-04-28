@@ -19,7 +19,7 @@ import copy
 
 from constants import constant
 
-c = constant('./ass1/DIDA.ds')
+c = constant('./ass1/DIDAs.ds')
 cudnn.benchmark = True
 plt.ion()   # interactive mode
 criterion = nn.CrossEntropyLoss()
