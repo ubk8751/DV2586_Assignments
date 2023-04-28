@@ -6,6 +6,7 @@ from keras.models import Sequential
 
 class ImgGPT():
     def __init__(self, input_shape=(32,32,3)):
+        self._built = False
         self._model = Sequential()
         self._model.add(BatchNormalization())
         self._model.add(Dense(32,activation="relu"))
@@ -44,6 +45,10 @@ class ImgGPT():
     def summary(self):
         return self._model.summary()
     
+    def build(self):
+        self._built = True
+        return self._model.build(input_shape=(None, 64,64,1))
+    
     def vgg_evaluate(self, valds, hist, model):
         ret = {
             "eval"    : model.evaluate(valds),
@@ -60,11 +65,14 @@ class ImgGPT():
         return ret
 
     def evaluate(self, valds):
-        return self._model.evaluate(valds)     
+        return self._model.evaluate(valds) 
     
     @property
     def model(self):
         return self._model
+    @property
+    def built(self):
+        return self._built
 
 def get_imgGPT():
     print("\nCreating imgGPT")
