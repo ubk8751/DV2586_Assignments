@@ -2,3 +2,8 @@ ass1/DIDA.ds
 ass1/DIDAs.ds
 ass1/cat.jpg
 *.tfds
+ass1/densenet.py
+ass1/vgg19.py
+ass1/resnet50.py
+ass1/data2.py
+models

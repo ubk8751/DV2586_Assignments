@@ -3,6 +3,10 @@ from imgGPT import get_imgGPT
 from data import create_data, remove, print_stat_row
 from PyAIGen import vgg19, ResNet50, DenseNet
 import matplotlib.pyplot as plt
+from vgg19 import get_vgg19, VGG19_10
+from resnet50 import get_resnet50, ResNet_10
+from densenet import get_densenet, DenseNet_10
+from data2 import get_or_create_data
 
 # External libs
 from keras.layers import *
@@ -18,14 +22,17 @@ epochs = 10
 
 # Run the program
 if __name__ == "__main__":
+    # Create training and validation datasets
     tds,vds = create_data(data_path)
     tds.save(tds_name)
     vds.save(vds_name)
 
+    # Create ImgGpt and evaluate it.
     imggpt      = get_imgGPT()
     fitimggpt   = imggpt.fit(tds, valds=vds, epochs=epochs, batch_size=1024)
     ImgGPT_stat = imggpt.vgg_evaluate(valds=vds,hist=fitimggpt,model=imggpt)
 
+    # Create the PyTorch networks
     Vgg_19, vgg_stats = vgg19(num_epochs=epochs, 
                               lr=0.001, 
                               momentum=0.9, 
@@ -45,7 +52,7 @@ if __name__ == "__main__":
                                  gamma=0.1, 
                                  v_model=False)
 
-    
+    # Print results
     print("{: <15} {: <15} {: <15} {: <15} {: <15} {: <15} {: <15} {: <15} {: <15} {: <15}".format("Model", "Accuracy", "Val_Acc", "Loss", "Val_Loss", "TP", "FP", "TN", "FN", "F1 score"))
     print_stat_row(ImgGPT_stat, "ImgGPT")
     print_stat_row(vgg_stats, "VGG-19")
@@ -57,6 +64,7 @@ if __name__ == "__main__":
     loss = fitimggpt.history["loss"]
     val_loss = fitimggpt.history["val_loss"]
 
+    # Plot Accuracy of ImgGPT
     x_axis = list(range(1, epochs+1))
     fig, ax = plt.subplots()
     ax.plot(x_axis, acc, color="blue", label="Train")
@@ -68,12 +76,13 @@ if __name__ == "__main__":
     ax.grid(True, which="both")
     plt.savefig("Accuracy.jpg")
 
-    x_axis = list(range(1, 5+1))
+    # Plot Loss of ImgGPT
+    x_axis = list(range(1, epochs+1))
     fig, ax = plt.subplots()
     ax.plot(x_axis, loss, color="blue", label="Train")
     ax.plot(x_axis, val_loss, color="red", label="Val")
     ax.set_xlabel("Epoch")
-    ax.set_ylabel("Accuracy")
+    ax.set_ylabel("Loss")
     ax.legend()
     ax.set_yticks(np.arange(0, max(val_loss)))
     ax.grid(True, which="both")

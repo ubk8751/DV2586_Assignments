@@ -5,7 +5,7 @@ import shutil
 from torch.utils.data import Subset
 from sklearn.model_selection import train_test_split
 
-image_dimensions = (64, 64)
+image_dimensions = (48,48)
 batch_size = 2
 shuffle_buffer = 1024
 
@@ -44,7 +44,7 @@ def create_data(path : str):
         # dataset.take(20)
         validation_data
         .map(scale_values)
-        .map(to_grayscale)
+        #.map(to_grayscale)
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )
@@ -52,7 +52,7 @@ def create_data(path : str):
     dataset = (
         dataset
         .map(scale_values)
-        .map(to_grayscale)
+        #.map(to_grayscale)
         .shuffle(shuffle_buffer)
         .batch(batch_size)
     )
