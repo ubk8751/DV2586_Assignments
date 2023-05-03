@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def _get_df(data_path:str = "./ass2/ass2data.csv"):
     df = pd.read_csv(
-        data_path, parse_dates=True, index_col="timestamp"
+        data_path, parse_dates=True
     )
     return df
 

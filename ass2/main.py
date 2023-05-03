@@ -19,8 +19,9 @@ def plot_column(df, col_name:str="temperature"):
     if not os.path.isdir(results_dir):
         os.makedirs(results_dir)
     
-    print(df.index)
-    plt.plot(x = df.index, y=df[col_name])
+    plt.plot(df["timestamp"],df[col_name])
+    plt.xlabel("Time")
+    plt.ylabel(col_name)
     plt.legend()
     plt.savefig(results_dir + col_name + "_plot.png")
 
