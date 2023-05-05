@@ -3,27 +3,19 @@ import os
 import matplotlib.pyplot as plt
 
 # Import modules
-from data import get_df_and_cleanup
+from data import get_df_and_cleanup, get_train_test, plot_column, normalize_df, get_x_y
+from model import AnomalyDetector
 
 data_path = "./ass2/ass2data.csv"
 
 def main(path:str = "./ass2/ass2data.csv", export_df:bool=False):
-    df = get_df_and_cleanup(path, export_df)
-    print(df.head(2))
-    plot_column(df, "temperature")
-
-def plot_column(df, col_name:str="temperature"):
-    # Some path management
-    script_dir = os.path.dirname(__file__)
-    results_dir = os.path.join(script_dir, 'img/')
-    if not os.path.isdir(results_dir):
-        os.makedirs(results_dir)
-    
-    plt.plot(df["timestamp"],df[col_name])
-    plt.xlabel("Time")
-    plt.ylabel(col_name)
-    plt.legend()
-    plt.savefig(results_dir + col_name + "_plot.png")
+    df = get_df_and_cleanup(path, export_df, filter=False)
+    train, test = get_train_test(df=df)
+    train, test = normalize_df(train=train, test=test)
+    LSTMAuto =  AnomalyDetector(train_data=train,opt="adam", loss="mae")
+    xt, yt = get_x_y(train)
+    xv, yv = get_x_y(test)
+    LSTMHist = LSTMAuto.fit_model(xt=xt, yt=yt, xv=xv, yv=yv)
 
 
 if __name__ == "__main__":
