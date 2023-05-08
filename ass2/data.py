@@ -144,8 +144,16 @@ Output:
     train (pd.DataFrame): A pands dataframe
     test (pd.DataFrame) : A pandas dataframe   
 """
-def get_train_test(df, test_size:float=0.3):
-    train, test = train_test_split(df, test_size=test_size)
+def get_train_test(df, test_size:float=0.3, sl:int=5):
+    data_columns = df.columns
+    print(data_columns)
+    df_length = len(df.index)
+    xs = []
+    for i in range(df_length-sl):
+        data_point = [df[data_col].iloc[i:i+sl].to_list() for data_col in data_columns]
+        data_point = [d for d in zip(*data_point)]
+        xs.append(data_point)
+    train, test = train_test_split(xs, test_size=test_size)
     train = pd.DataFrame(train, columns=df.columns)
     test = pd.DataFrame(test, columns=df.columns)
     print(f'Train shape: {train.shape}; Test shape: {test.shape}')
@@ -204,7 +212,6 @@ def get_x_y(ds):
     for r in ds:
         y.append(r[0][-1])
         x.append(r[0][:-1])
-    print(x)
     x = pd.DataFrame(x,columns=["temperature", "pressure", "humidity"])
     y = pd.DataFrame(y,columns=["status"])
     # y = np.array([x[-1] for x[0] in ds]).reshape(1,ds.shape[2])
