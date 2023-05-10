@@ -10,7 +10,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
-
+# NOTE: Add function to sequencify data (for i in range(len(ds) - SL): new_ds.append(ds[i:i+SL]))
 """
 Private function for  turning a pandas dataframe
 
