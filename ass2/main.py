@@ -12,7 +12,11 @@ def main(path:str = "./ass2/ass2data.csv", export_df:bool=False):
     train, val = get_data(path=path, export_df=export_df)
     LSTMAuto =  AnomalyDetector(train_data=train,opt="adam", loss="mae")
     
-    LSTMHist = LSTMAuto.fit_model(train=train,validation=val, epochs=20000)
+    LSTMHist = LSTMAuto.fit_model(train=train,validation=val, epochs=2000)
+
+    preds = LSTMAuto.predict_model(data=val, batch_size=4)
+
+    print(preds)
 
 
 if __name__ == "__main__":

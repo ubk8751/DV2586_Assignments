@@ -35,6 +35,9 @@ class AnomalyDetector():
     def fit_model(self, train, validation, batch_size:int=4, epochs:int=5):
         return self.model.fit(train, validation_data=validation, batch_size=batch_size, epochs=epochs)
     
+    def predict_model(self, data, batch_size:int=4):
+        return self._model.predict(x=data,batch_size=batch_size)
+    
     @property
     def model(self):
         return self._model

@@ -46,10 +46,6 @@ def get_data(path:str="./ass2/ass2data.csv", export_df:bool=False):
 
     return train, val
 
-
-        
-        
-
 def _get_df(path:str="./ass2/ass2data.csv"):
     df = pd.read_csv(path, parse_dates=True, index_col="timestamp")
     cols = df.columns.tolist()
