@@ -11,6 +11,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from typing import *
 
+split_date = "2004-02-17 07:12:39"
+
 def get_data(path:str="./ass2/dataset2.csv", export_df:bool=False):
     if os.path.exists("./ass2/df/traindf.tfds") and os.path.exists("./ass2/df/valdf.tfds"):
         train = tf.data.Dataset.load("./ass2/df/traindf.tfds")
@@ -20,30 +22,43 @@ def get_data(path:str="./ass2/dataset2.csv", export_df:bool=False):
             # Get data as PD dataframe
             print(f'Found data file at "{path}"!')
             df, data_cols = _get_df(path=path)
+            print(f'DF shape: {df.shape}')
+            print(df.head(5))
+
+            # There are no NaN values in the data, but just to be sure, we replace any NaN values with 0 
+            # since we still want the data points, and it'll result in an anomaly later on.
+            df.fillna(0)
 
             # Plot sensor data
             _plot_data(df)
+
+            # After plotting the data we can see that it is not optimal as it more or less stay the same then 
+            # suddenly rise quicly, menaing that all anomalies will be at the end. W can however say that any 
+            # unnecessary removal of outliers wouldn't make it better, so we skip that step.
             
-            # Normalize per column
-            for col in data_cols:
-                _normalize_col(df, col)
+            # Normalize data per column. We do not wish to normalize over the entire dataset because it could 
+            # affect any anomlies.
+            scalers = [_normalize_data(df=df, col=col) for col in data_cols]
+
+            # Split the dataset into train and validation set
+            train, val = _train_val_split(ds=df)
             
             # Sequencify the data
-            Sdfx = _sequencify_df(df=df, sl=5, data_columns=data_cols)
+            trainDS = _sequencify_df(df=train, sl=5, data_columns=data_cols)
+            print(f'Norm train data shape: {trainDS.shape}')
+            print(trainDS[0])
+
+            valDS = _sequencify_df(df=val, sl=5, data_columns=data_cols)
+            print(f'Norm val data shape: {valDS.shape}')
+            print(valDS[0])
             
-            # The goal is to recreat the data, so our y = x
-            Sdfy = Sdfx
-
-            ds = tf.data.Dataset.from_tensor_slices((Sdfx, Sdfy))
-
-            train, val = _train_val_split(ds=ds, vs_split=0.3, batch_size=64, buffer_size=128)
-
             if export_df:
                 train.save("./ass2/df/traindf.tfds")
                 val.save("./ass2/df/valdf.tfds")
 
-    return train, val
+    return ((trainDS, trainDS), (valDS, valDS), scalers, df)
 
+# Basic data plotting function
 def _plot_data(ds):
     fig, ax = plt.subplots(figsize=(14,6),dpi=80)
     ax.plot(ds['Bearing 1'], label="Bearing 1", color='Blue', animated=True, linewidth=1)
@@ -54,48 +69,33 @@ def _plot_data(ds):
     ax.set_title("Sensor data")
     plt.savefig("./ass2/img/SensorData.jpg")
 
+# Function for turning a CSV file into a pandas dataframe
 def _get_df(path:str="./ass2/dataset2.csv"):
-    df = pd.read_csv(path, header=0, index_col="timestamp", delimiter=",")
-    return (df, df.columns)
+    df = pd.read_csv(path)
+    return (df, ['Bearing 1', 'Bearing 2', 'Bearing 3', 'Bearing 4'])
 
-def _normalize_col(df, col):
-    df[col] = df[col] / df[col].max()
+# Normalizes the dataframe at df[[col]] using MinMaxScaling.
+def _normalize_data(df, col):
+    scaler = MinMaxScaler()
+    df[[col]] = scaler.fit_transform(df[[col]])
+    return scaler
 
-def _add(row):
-    if row[3] + row[4] + row[5] > 1:
-        return 1
-    return 0
-
+# Sequnecifies the data with sl long sequences. 
 def _sequencify_df(df, sl:int=5, data_columns:list=["Bearing 1", "Bearing 2", "Bearing 3", "Bearing 4"]):
     xs = []
     df_length = len(df.index)
-    for i in range(df_length-sl):
+    for i in range(df_length-sl+1):
         data_point = [df[data_col].iloc[i:i+sl].to_list() for data_col in data_columns]
         data_point = [d for d in zip(*data_point)]
         xs.append(data_point)
-    return xs
+    return np.array(xs)
 
-def _train_val_split(ds, vs_split:float=0.3, batch_size:int=64, buffer_size:int=128):
-    count = tf.data.experimental.cardinality(ds)
-    val_count = tf.floor(tf.cast(count, tf.float32) * vs_split).numpy()
-    val_ds = ds.take(val_count)
-    ds = ds.skip(val_count)
-    
-    ds = ( 
-        ds
-        .shuffle(buffer_size=buffer_size)
-        .batch(batch_size=batch_size)
-    )
-    
-    val_ds = (
-        val_ds
-        .batch(1000)
-    )
-    
-    return ds, val_ds
-
-
+# Splits the dataframe into training and validation datasets at split_date from the data.
+def _train_val_split(ds):
+    train_ds = ds[ds["timestamp"] < split_date]
+    val_ds = ds[ds["timestamp"] >= split_date].reset_index()
+    return train_ds, val_ds
 
 if __name__ == "__main__":
     train, val = get_data(path="./ass2/dataset2.csv")
-    print(train, val)
+    #print(train, val)

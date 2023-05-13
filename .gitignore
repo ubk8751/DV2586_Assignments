@@ -8,3 +8,4 @@ ass1/resnet50.py
 ass1/data2.py
 models
 ass2/img
+ass2/scalers/
