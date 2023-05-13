@@ -1,16 +1,17 @@
+# Used since I save some files and stuff
 import os
-import joblib
 
+# Import packages
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
-from sklearn.model_selection import train_test_split
+# Import functions
 from sklearn.preprocessing import MinMaxScaler
 from typing import *
 
+# Defined by choosing approximately the 700:th item in the dataset, didn't want to do this one dynamically.
 split_date = "2004-02-17 07:12:39"
 
 def get_data(path:str="./ass2/dataset2.csv", export_df:bool=False):
@@ -80,7 +81,7 @@ def _normalize_data(df, col):
     df[[col]] = scaler.fit_transform(df[[col]])
     return scaler
 
-# Sequnecifies the data with sl long sequences. 
+# Sequnecifies the data into a numpy array of of sl long sequences. 
 def _sequencify_df(df, sl:int=5, data_columns:list=["Bearing 1", "Bearing 2", "Bearing 3", "Bearing 4"]):
     xs = []
     df_length = len(df.index)

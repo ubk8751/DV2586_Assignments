@@ -1,12 +1,12 @@
+# Import entire packages
 import numpy as np
-import pandas as pd
-from tensorflow import keras
 import tensorflow as tf
-from keras import layers, regularizers
-from keras.models import Model, Sequential
-from keras.metrics import Accuracy
-from matplotlib import pyplot as plt
 
+# Import seperate functions and classes
+from keras import layers, regularizers
+from keras.models import Sequential
+
+# I needed this fro something, but not sure if I can remove it without accidentally destroy the code
 tf.config.run_functions_eagerly(True)
 
 class AnomalyDetector():
@@ -36,6 +36,7 @@ class AnomalyDetector():
         model.add(layers.TimeDistributed(layers.Dense(4, activation='sigmoid')))
         
         # Compile the model
+        print("Compiling model...")
         model.compile(optimizer=self._optimizer, loss=self._loss, metrics=[])
         
         # Present model summary
@@ -43,6 +44,7 @@ class AnomalyDetector():
         model.summary()
         return model
 
+    # Anomaly htreshold for each Bearing is the MAE value that Bearing.
     def create_thresholds(self, val, data_actual, batch_size:int=4):
         preds = self._predict_model(data=val, batch_size=batch_size)
         e = np.abs(preds - data_actual)
@@ -52,10 +54,8 @@ class AnomalyDetector():
         for item in error:
             for i in range(len(item.tolist())):
                 thresholds[i] += item[i]
-        print(thresholds)
         for i in range(len(thresholds)):
             thresholds[i] /= len(error)
-        print(thresholds)
         return thresholds
 
     def fit_model(self, train, validation, batch_size:int=4, epochs:int=5):
