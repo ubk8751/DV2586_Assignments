@@ -19,7 +19,7 @@ def main(path:str = "./ass2/dataset2.csv", export_df:bool=False):
     LSTMAO =  AnomalyDetector(train_data=train,opt="adam", loss="mae")
     
     # Fit model
-    LSTMHist = LSTMAO.fit_model(train=train,validation=val, epochs=5)
+    LSTMHist = LSTMAO.fit_model(train=train,validation=val, epochs=100)
     plot_loss(hist=LSTMHist.history, labels=['loss', 'val_loss'], title='Model Loss', y_label='loss (MAE)', x_label='epoch')
 
     # Evaluate model

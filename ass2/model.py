@@ -56,6 +56,7 @@ class AnomalyDetector():
                 thresholds[i] += item[i]
         for i in range(len(thresholds)):
             thresholds[i] /= len(error)
+            thresholds[i] += thresholds[i] * 0.5
         return thresholds
 
     def fit_model(self, train, validation, batch_size:int=4, epochs:int=5):

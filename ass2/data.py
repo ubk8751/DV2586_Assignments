@@ -28,6 +28,7 @@ def get_data(path:str="./ass2/dataset2.csv", export_df:bool=False):
 
             # There are no NaN values in the data, but just to be sure, we replace any NaN values with 0 
             # since we still want the data points, and it'll result in an anomaly later on.
+            print(f'Number of NaN values in dataframe:\n {df.isna().sum()}')
             df.fillna(0)
 
             # Plot sensor data
