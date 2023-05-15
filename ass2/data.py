@@ -1,3 +1,15 @@
+########################################################################################
+#
+# DV2586: Deep Machine Learning
+# Assignment 2
+# Data Functions module
+#
+# Code by:
+#   Samuel Jonsson
+#   DVAMI19h
+#
+#########################################################################################
+
 # Used since I save some files and stuff
 import os
 

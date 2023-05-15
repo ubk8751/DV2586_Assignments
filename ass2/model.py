@@ -1,3 +1,15 @@
+########################################################################################
+#
+# DV2586: Deep Machine Learning
+# Assignment 2
+# Model module
+#
+# Code by:
+#   Samuel Jonsson
+#   DVAMI19h
+#
+#########################################################################################
+
 # Import entire packages
 import numpy as np
 import tensorflow as tf
@@ -6,7 +18,7 @@ import tensorflow as tf
 from keras import layers, regularizers
 from keras.models import Sequential
 
-# I needed this fro something, but not sure if I can remove it without accidentally destroy the code
+# I needed this for something, but not sure if I can remove it without accidentally destroy the code
 tf.config.run_functions_eagerly(True)
 
 class AnomalyDetector():

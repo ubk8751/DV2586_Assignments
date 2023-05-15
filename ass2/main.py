@@ -1,3 +1,15 @@
+########################################################################################
+#
+# DV2586: Deep Machine Learning
+# Assignment 2
+# Main code
+#
+# Code by:
+#   Samuel Jonsson
+#   DVAMI19h
+#
+#########################################################################################
+
 # Import packages
 import matplotlib.pyplot as plt
 import numpy as np
